@@ -6,69 +6,148 @@
 <title>Обратный отсчёт до 5 ноября 2026</title>
 <style>
   * { box-sizing: border-box; }
+  
+  /* Убираем любые скроллы и лишние отступы */
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; 
+  }
+
   body {
-    margin: 0; min-height: 100vh; display: grid; place-items: center;
-    padding: 10px;
+    display: grid;
+    place-items: center;
     background: transparent;
     color: #f7f7f7;
     font-family: system-ui, -apple-system, Segoe UI, sans-serif;
   }
+
   main {
     width: min(100%, 760px);
     text-align: center;
-    padding: clamp(20px, 4vw, 32px) 16px;
+    padding: clamp(16px, 4vw, 32px) 16px;
     border-radius: 14px;
     background: #202124;
     border: 1px solid #3b3d40;
     box-shadow: 0 4px 18px rgba(0, 0, 0, .16);
   }
+
   h1 {
     font-size: clamp(1.05rem, 3vw, 1.5rem);
     font-weight: 650;
-    margin: 0 0 18px;
+    margin: 0 0 24px;
     color: #f7f7f7;
   }
-  #timer {
+
+  /* Контейнер для таймера */
+  .timer-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(4px, 2vw, 16px);
+  }
+
+  /* Блок с цифрами и подписью */
+  .time-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Сами цифры */
+  .time-value {
     font-size: clamp(1.65rem, 6vw, 3.5rem);
     font-weight: 800;
     letter-spacing: .02em;
     font-variant-numeric: tabular-nums;
     color: #ffffff;
     text-shadow: 0 1px 1px rgba(0, 0, 0, .35);
-    white-space: nowrap;
+    line-height: 1;
   }
-  .labels {
+
+  /* Двоеточия между блоками */
+  .separator {
+    font-size: clamp(1.65rem, 6vw, 3.5rem);
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+    padding-bottom: 20px; /* Выравнивание по центру цифр, игнорируя подпись */
+  }
+
+  /* Подписи (дней, часов и т.д.) */
+  .time-label {
     margin-top: 10px;
     color: #c8cbd0;
     font-size: .82rem;
     letter-spacing: .03em;
-    word-spacing: 1.15rem;
+    white-space: nowrap;
   }
 </style>
 </head>
 <body>
 <main>
   <h1>До 5 ноября 2026 года, 02:00 МСК</h1>
-  <div id="timer" role="timer" aria-live="off">Загрузка таймера…</div>
-  <div class="labels">дней часов минут секунд</div>
+  
+  <div class="timer-container" role="timer" aria-live="off">
+    <div class="time-block">
+      <div class="time-value" id="days">00</div>
+      <div class="time-label">дней</div>
+    </div>
+    <div class="separator">:</div>
+    <div class="time-block">
+      <div class="time-value" id="hours">00</div>
+      <div class="time-label">часов</div>
+    </div>
+    <div class="separator">:</div>
+    <div class="time-block">
+      <div class="time-value" id="minutes">00</div>
+      <div class="time-label">минут</div>
+    </div>
+    <div class="separator">:</div>
+    <div class="time-block">
+      <div class="time-value" id="seconds">00</div>
+      <div class="time-label">секунд</div>
+    </div>
+  </div>
+
 </main>
+
 <script>
 (() => {
   const target = new Date("2026-11-05T02:00:00+03:00").getTime();
-  const el = document.getElementById("timer");
+  
+  // Получаем элементы
+  const elDays = document.getElementById("days");
+  const elHours = document.getElementById("hours");
+  const elMinutes = document.getElementById("minutes");
+  const elSeconds = document.getElementById("seconds");
+  
   const pad = n => String(n).padStart(2, "0");
+  
   function update() {
     let ms = target - Date.now();
+    
     if (ms <= 0) {
-      el.textContent = "00 : 00 : 00 : 00";
+      elDays.textContent = "00";
+      elHours.textContent = "00";
+      elMinutes.textContent = "00";
+      elSeconds.textContent = "00";
       return;
     }
+    
     const days = Math.floor(ms / 86400000); ms %= 86400000;
     const hours = Math.floor(ms / 3600000); ms %= 3600000;
     const minutes = Math.floor(ms / 60000); ms %= 60000;
     const seconds = Math.floor(ms / 1000);
-    el.textContent = `${pad(days)} : ${pad(hours)} : ${pad(minutes)} : ${pad(seconds)}`;
+    
+    // Записываем значения в отдельные элементы
+    elDays.textContent = pad(days);
+    elHours.textContent = pad(hours);
+    elMinutes.textContent = pad(minutes);
+    elSeconds.textContent = pad(seconds);
   }
+  
   update();
   setInterval(update, 1000);
 })();
